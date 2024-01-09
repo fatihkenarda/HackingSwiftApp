@@ -31,68 +31,66 @@ struct CheckoutAdvencedView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack {
-                Section {
-                    Picker("How do you want to pay", selection: $paymentType){
-                        ForEach(PaymentType.allCases, id: \.self) { item in
-                            Text(item.rawValue)
-                                .padding(.all)
-                        }
-                    }
-                    .pickerStyle(.navigationLink)
-                    
-                    Toggle("Add iDine loyalty card", isOn: $addLoyaltyDetails)
-                    if addLoyaltyDetails {
-                        TextField("Enter your iDine ID", text: $loyaltyNumber)
+        Form {
+            Section {
+                Picker("How do you want to pay", selection: $paymentType){
+                    ForEach(PaymentType.allCases, id: \.self) { item in
+                        Text(item.rawValue)
+                            .padding(.all)
                     }
                 }
-                Section("Add a tip ?"){
-                    Picker("Tips", selection: $amountType){
-                        ForEach(AmountType.allCases, id: \.self) { item in
-                            Text("\(item.rawValue.description)%")
-                                .padding(.all)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
+                .pickerStyle(.navigationLink)
                 
-                Section {
-                    List{
-                        ForEach(order.items) { item in
-                            HStack {
-                                Text(item.name)
-                                Spacer()
-                                Text("$\(item.price)")
-                            }
-                        }.onDelete(perform: { indexSet in
-                            order.items.remove(atOffsets: indexSet)
-                        })
-                    }.toolbar{
-                        EditButton()
+                Toggle("Add iDine loyalty card", isOn: $addLoyaltyDetails)
+                if addLoyaltyDetails {
+                    TextField("Enter your iDine ID", text: $loyaltyNumber)
+                }
+            }
+            Section("Add a tip ?"){
+                Picker("Tips", selection: $amountType){
+                    ForEach(AmountType.allCases, id: \.self) { item in
+                        Text("\(item.rawValue.description)%")
+                            .padding(.all)
                     }
                 }
-                
-                Spacer()
+                .pickerStyle(.segmented)
+            }
+            
+            Section {
+                List{
+                    ForEach(order.items) { item in
+                        HStack {
+                            Text(item.name)
+                            Spacer()
+                            Text("$\(item.price)")
+                        }
+                    }.onDelete(perform: { indexSet in
+                        order.items.remove(atOffsets: indexSet)
+                    })
+                }
+            }
+            
+            Section(){
                 Button{
                     isAlertVisible.toggle()
                 }
                 label: {
                     Text("Complete \(totalPrice)")
                 }.disabled(!checkValidation())
-                .pickerStyle(.menu)
-                Spacer()
-                .navigationTitle("Payment")
             }
+            
+            .pickerStyle(.menu)
+            
         }
-        .padding(.all)
         .alert("Hello", isPresented: $isAlertVisible){
         }
         message : {
             Text("Your total was \(totalPrice) Thank You.")
         }
- 
+        .navigationTitle("Payment")
+        .navigationBarTitleDisplayMode(.inline)
     }
+    
 }
 
 struct CheckoutAdvencedView_Previews : PreviewProvider{
